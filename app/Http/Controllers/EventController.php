@@ -11,7 +11,7 @@ class EventController extends Controller
     {
         $events = Event::where("published", true)
                          ->orderByRaw("-order_number DESC")
-                        //  ->orderByRaw("-date ASC")
+                         ->orderByRaw("-created_at ASC")
                          ->get();
 
         return $events;
