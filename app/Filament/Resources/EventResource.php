@@ -37,55 +37,72 @@ class EventResource extends Resource
                     'sm' => 1,
                     'md' => 1,
                 ])->schema([
-                  
-                TextInput::make('title')
-                    ->label('Virsraksts')
-                    ->required()
-                    ->maxLength(255),
-                DatePicker::make('date')
-                    ->label('Datums')
-                    ->native(false)
-                    ->placeholder('Okt 12, 2024'),
-                DatePicker::make('date_untill')
-                    ->label('Datums līdz')
-                    ->native(false)
-                    ->placeholder('Okt 19, 2024'),
-                // TimePicker::make('time')
-                //     ->label('Laiks (ja attiecas)')
-                //     ->native(false)
-                //     ->placeholder('18:50:00'),
-                TextInput::make('short_info')
-                ->label('Īss apraksts sākumlapā')
-                ->maxLength(255),
-                
-                FileUpload::make("image")
-                    ->label("Attēls")
-                    ->required(),
-                RichEditor::make("description")
-                    ->label("Apraksts")
-                    ->required()
-                    ->toolbarButtons([
-                        "blockquote",
-                        "bold",
-                        "bulletList",
-                        "h2",
-                        "h3",
-                        "italic",
-                        "link",
-                        "orderedList",
-                        "redo",
-                        "strike",
-                        "underline",
-                        "undo",
+                    TextInput::make('title')
+                        ->label('Virsraksts')
+                        ->required()
+                        ->maxLength(255),
                     ]),
-                TextInput::make('order_number')
-                    ->label('Numurs pēc kārtas (var atstāt tukšu)')
-                    ->integer(),
-                Checkbox::make("published")
-                    ->label("Publicēt")
-                    ->default(true),
-                    
-                ]),
+
+                    Section::make()
+                    ->columns([
+                        'sm' => 2
+                    ])->schema([
+                        DatePicker::make('date')
+                            ->label('Datums')
+                            ->native(false)
+                            ->placeholder('Okt 12, 2024'),
+                        DatePicker::make('date_untill')
+                            ->label('Datums līdz')
+                            ->native(false)
+                            ->placeholder('Okt 19, 2024'),
+                        TimePicker::make('start_time')
+                            ->label('Sākuma laiks')
+                            ->native(false)
+                            ->seconds(false)
+                            ->placeholder('18:00'),
+                        TimePicker::make('end_time')
+                            ->label('Beigu laiks')
+                            ->native(false)
+                            ->seconds(false)
+                            ->placeholder('21:00'),
+                        ]),
+
+                        Section::make()
+                        ->columns([
+                            'sm' => 1,
+                            'md' => 1,
+                        ])->schema([
+                            TextInput::make('short_info')
+                            ->label('Īss apraksts sākumlapā')
+                            ->maxLength(255),
+                            
+                            FileUpload::make("image")
+                                ->label("Attēls")
+                                ->required(),
+                            RichEditor::make("description")
+                                ->label("Apraksts")
+                                ->required()
+                                ->toolbarButtons([
+                                    "blockquote",
+                                    "bold",
+                                    "bulletList",
+                                    "h2",
+                                    "h3",
+                                    "italic",
+                                    "link",
+                                    "orderedList",
+                                    "redo",
+                                    "strike",
+                                    "underline",
+                                    "undo",
+                                ]),
+                            TextInput::make('order_number')
+                                ->label('Numurs pēc kārtas (var atstāt tukšu)')
+                                ->integer(),
+                            Checkbox::make("published")
+                                ->label("Publicēt")
+                                ->default(true),
+                            ]),
                 
                 ]);
     }
@@ -93,17 +110,19 @@ class EventResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn (Builder $query) => $query->orderBy('date', 'ASC'))
+            // ->modifyQueryUsing(fn (Builder $query) => $query->orderBy('date', 'ASC'))
             ->columns([
                 Tables\Columns\TextColumn::make('title')
                     ->label('Virsraksts')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('date')
                     ->label('Datums')
-                    ->date(),
-                Tables\Columns\TextColumn::make('date_untill')
-                    ->label('Līdz')
-                    ->date(),
+                    ->date()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('start_time')
+                    ->label('Laiks')
+                    ->time(),
                 Tables\Columns\ImageColumn::make('image')
                     ->label('Attēls'),
                 Tables\Columns\CheckboxColumn::make("published")
@@ -113,6 +132,7 @@ class EventResource extends Resource
                     ->label("Nr. p. k.")
                     ->rules(["numeric"]),
             ])
+            ->defaultSort('updated_at', "desc")
             ->filters([
                 //
             ])

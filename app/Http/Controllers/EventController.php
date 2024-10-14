@@ -10,8 +10,9 @@ class EventController extends Controller
     public function index()
     {
         $events = Event::where("published", true)
-                         ->orderByRaw("-order_number DESC")
-                         ->orderByRaw("-created_at ASC")
+                         ->orderByRaw("order_number DESC")
+                         ->orderByRaw("ISNULL(date), date DESC")
+                         ->orderByRaw("start_time ASC")
                          ->get();
 
         return $events;
